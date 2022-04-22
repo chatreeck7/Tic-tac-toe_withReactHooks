@@ -1,13 +1,10 @@
 import logo from './logo.svg';
 import './App.css';
 import ReactDOM from 'react-dom';
-import React, { useState }from 'react';
+import "./App.css";
+import React from 'react';
 import Game from './components/Game'
 
-function App() {
-  return (
-    <Game/>
-  );
-}
+ReactDOM.render(<Game/>, document.getElementById("root"));
 //===================================
-export default App;
+

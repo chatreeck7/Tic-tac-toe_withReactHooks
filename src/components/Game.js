@@ -3,61 +3,50 @@ import { calculateWinner } from "./calc-winner.js";
 import Board from "./Board.js";
 //Hook vers.
 function Game(){
-    
+
     const[XNext, setXNext] = useState(true)
     const[step, setStep] = useState(0)
     const[history, setHistory] = useState([Array(9).fill(null)])
-    
-    function completeTurn(our_history,square){
-        setHistory( [...our_history,square])
-        setStep(history.length);
-        setXNext(!XNext);
-    }
-    
+
+    const winner = calculateWinner(history[step]);
+   
     function jumpTo(step){
         setStep(step);
-        setXNext((step%2) == 0);
+        setXNext((step%2) === 0);
     }
     function handleClick(i){
       //consider at from beginning not after that point
         const our_history = history.slice(0, step+1);
         const current = our_history[step];
-        const square = current.slice(0);
-        console.log(square)
+        const squares = [...current];
+        console.log(squares)
         //return if won or occupied
-        if(calculateWinner(square) || square[i]){
+        if(winner || squares[i]){
             return;
         }
         //if the game is not over , select square
-        square[i] = XNext ? 'X':'O';
-        completeTurn(our_history, square);
+        squares[i] = XNext ? 'X':'O';
+        setHistory( [...our_history,squares])
+        setStep(our_history.length);
+        setXNext(!XNext);
     }
     
-    const our_history = history;
-    const current = our_history[step];
-    const winner = calculateWinner(current);
-    const moves = history.map((st, move) => {
-      const desc = move ? 
-      'Go to move #' + move :
-      'Go to game start';
-      return (
-        <li key={move}>
-          <button onClick={() => jumpTo(move)}>
-            {desc}
-          </button>
-        </li>
-      );
-    });
-    let status;
-    if(winner){
-      status = 'Winner: ' + winner;
-    } else {
-      status = "Next player: "+ (XNext ? 'X':'O');
+    function renderMoves(){
+        return history.map((_step,move)=> {
+            const destination = move ? `Go to move #${move}` : "Go to Start";
+            return (
+              <li key={move}>
+                <button onClick={() => jumpTo(move)}>{destination}</button>
+              </li>
+            );
+        });
     }
+    
     return (
       <div className='game'>
         <div className='game-board'>
           {/* Can provide every data in this code */}
+          <h1>React Tic Tac Toe - With Hooks</h1>
           {/* <squaresContext.Provider value={current}>
               <Board/>
           </squaresContext.Provider>
@@ -65,10 +54,13 @@ function Game(){
               <Board/>
           </onClickContext.Provider> */}
             <Board squares={history[step]} onClick={(i)=> handleClick(i)}/>
-        </div>
-        <div className='game-info'>
-            <div>{status}</div>
-            <ol>{moves}</ol>
+            <div className="info-wrapper">
+              <div>
+                <h3> History </h3>
+                {renderMoves()}
+              </div>
+              <h3>{winner ? "Winner: " + winner : "Next Player: " + (XNext ? 'X':'O')}</h3>
+            </div>
         </div>
       </div>
     );
